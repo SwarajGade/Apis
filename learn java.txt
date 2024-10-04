@@ -1,0 +1,40 @@
+ topics
+
+*java basics
+
+normalization
+grpc
+microservice architecture 
+github
+testdrivern devlopement
+write test cases before the starting the devlopment using junit  mockito etc 
+functinal interfaces 
+streams api (imp)
+multiple interfaces *
+multiple inheritance*
+
+orchestartions *
+jenkings *
+spinacker pipelines *
+ci cd pipelines *
+postman
+bluegreen deployment in prod 
+load test using jmeter 
+integration tests
+stubbs and mocks
+
+java plugins :
+resiliance 4j
+springboot starter pack 
+jpa starter pack
+devtools
+open api
+postgres starter pack
+junit 5 an mockito
+web mvc 
+web flux
+
+
+stream functions
+map & flatmap
+faced migration

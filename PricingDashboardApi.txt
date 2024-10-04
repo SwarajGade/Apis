@@ -1,0 +1,1169 @@
+openapi: 3.0.3
+info:
+  title: Pricing Dashboard API
+  version: 2.0.0
+  contact:
+    name: VoltaCabs
+    email: volta@voltacabs.com
+    url: https://voltacabs.com
+  description:
+   This API manages pricing rules for services, including base pricing, distance pricing, vehicle types, and surge pricing, with secure JWT authentication.
+   
+servers:
+  - url: http://voltacabs.com/api/v2
+  
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    BasePricing:
+      type: object
+      properties:
+        id:
+          type: integer
+        vehicleType:
+          type: integer
+        minFare:
+          type: number
+          format: float
+        costPerAdditionalDistance:
+          type: number
+          format: float
+        baseKilometers:
+          type: integer
+        cgst:
+          type: number
+          format: float
+        sgst:
+          type: number
+          format: float
+        serviceType:
+          type: integer
+        isApproved:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        tenantId:
+          type: integer
+    DistancePricing:
+      type: object
+      properties:
+        id:
+          type: integer
+        distanceStartKm:
+          type: number
+          format: float
+        distanceEndKm:
+          type: number
+          format: float
+        pricePerKm:
+          type: number
+          format: float
+        createdAt:
+          type: string
+          format: date-time
+        tenantId:
+          type: integer
+        isApproved:
+          type: boolean
+    VehicleType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        tenantId:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+        isActive:
+          type: integer
+        createdBy:
+          type: integer
+        updatedBy:
+          type: integer
+    SurgePrice:
+      type: object
+      properties:
+        id:
+          type: integer
+        startDate:
+          type: string
+          format: date
+        day:
+          type: string
+        startTime:
+          type: string
+          format: time
+        endTime:
+          type: string
+          format: time
+        vehicleTypeId:
+          type: integer
+        endDate:
+          type: string
+          format: date
+        dayOfWeek:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        tenantId:
+          type: integer
+        amount:
+          type: number
+          format: float
+        isApproved:
+          type: boolean
+        cgst:
+          type: number
+          format: float
+        sgst:
+          type: number
+          format: float
+        serviceType:
+          type: integer
+        multiplier:
+          type: integer
+    ParcelType:
+      type: object
+      properties:
+        id:
+          type: integer
+        typeName:
+          type: string
+        tenantId:
+          type: integer
+    ParcelWeight:
+      type: object
+      properties:
+        id:
+          type: integer
+        weightRange:
+          type: string
+        minWeight:
+          type: number
+          format: float
+        maxWeight:
+          type: number
+          format: float
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        isActive:
+          type: integer
+        createdBy:
+          type: integer
+        updatedBy:
+          type: integer
+    ParcelSizes:
+      type: object
+      properties:
+        id:
+          type: integer
+        min_dimensions:
+          type: number
+          format: float
+        max_dimenstions:
+         type: number
+         format: float
+        is_active:
+          type: integer
+        created_by:
+          type: integer
+        updated_by:
+          type: integer
+    ParcelRates:
+      type: object
+      properties:
+        id:
+          type: integer
+        parcel_type_id:
+          type: integer
+        parcel_weight_id:
+          type: integer
+        price:
+          type: number
+          format: float
+        created_by:
+          type: number
+          format: float
+        updated_by:
+          type: number
+          format: float
+    ServiceTypes:
+      type: object
+      properties:
+        id:
+          type: integer
+        service_id:
+          type: integer
+        service_name:
+          type: string
+      required:
+        - service_id
+        - service_name
+    ApplicationApis:
+      type: object
+      properties:
+        id:
+          type: integer
+        servicetype:
+          type: string
+        distance:
+          type: number
+          format: float
+        parcelSize: 
+          type: integer
+        parcelType: 
+          type: string
+        parcel Dimensions: 
+          type: string
+        parcelWeight: 
+          type: string
+
+  parameters:
+    IdParameter:
+      name: id
+      in: path
+      required: true
+      description: Unique ID of the resource
+      schema:
+        type: integer
+    service_idParameter:
+      name: serviceId
+      in: path
+      required: true
+      description: The ID of the service type
+      schema:
+        type: integer
+    
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Base Pricing
+    description: Operations related to base pricing rules
+  - name: Distance Pricing
+    description: Operations related to distance pricing rules
+  - name: Vehicle Type
+    description: Operations related to vehicle types
+  - name: Surge Pricing
+    description: Operations related to surge pricing rules
+  - name: Parcel Type
+    description: Operations related to parcel types
+  - name: Parcel Weight
+    description: Operations related to parcel weight ranges
+  - name: Parcel Sizes
+    description: Operations related to parcel sizes
+  - name: Parcel Rates
+    description:  Operations related to parcel Rates
+  - name: Service Type
+    description: Operations related to Service Type
+  - name: Application Apis
+    description: Operations related to Application Apis
+
+paths:
+  /pricing/basepricing:
+    post:
+      tags:
+        - Base Pricing
+      summary: Create a new base pricing rule
+      operationId: createBasePricing
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasePricing'
+      responses:
+        '201':
+          description: Base pricing rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasePricing'
+        '400':
+          description: Bad Request
+
+  /pricing/updatebasepricing:
+    put:
+      tags:
+        - Base Pricing
+      summary: Update an existing base pricing rule
+      operationId: updateBasePricing
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasePricing'
+      responses:
+        '200':
+          description: Base pricing rule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasePricing'
+        '400':
+          description: Bad Request
+
+  /pricing/getallbasepricerules:
+    get:
+      tags:
+        - Base Pricing
+      summary: Retrieve all base pricing rules
+      operationId: getAllBasePricingRules
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of base pricing rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BasePricing'
+
+  /pricing/getbasepricerule/{id}:
+    get:
+      tags:
+        - Base Pricing
+      summary: Retrieve a specific base pricing rule by ID
+      operationId: getBasePricingRuleById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: Base pricing rule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasePricing'
+
+  /basepricing/{id}:
+    delete:
+      tags:
+        - Base Pricing
+      summary: Delete a specific base pricing record by ID
+      operationId: deleteBasePricing
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '204':
+          description: No Content
+
+  /pricing/distancepricing:
+    post:
+      tags:
+        - Distance Pricing
+      summary: Create a new distance pricing rule
+      operationId: createDistancePricing
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DistancePricing'
+      responses:
+        '201':
+          description: Distance pricing rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistancePricing'
+        '400':
+          description: Bad Request
+
+  /distancepricing:
+    get:
+      tags:
+        - Distance Pricing
+      summary: Retrieve all distance pricing records
+      operationId: getAllDistancePricing
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of distance pricing records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DistancePricing'
+
+  /distancepricing/{id}:
+    get:
+      tags:
+        - Distance Pricing
+      summary: Retrieve a specific distance pricing record by ID
+      operationId: getDistancePricingById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: Distance pricing record details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistancePricing'
+
+    put:
+      tags:
+        - Distance Pricing
+      summary: Update an existing distance pricing record by ID
+      operationId: updateDistancePricing
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DistancePricing'
+      responses:
+        '200':
+          description: Distance pricing record updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistancePricing'
+        '400':
+          description: Bad Request
+
+    delete:
+      tags:
+        - Distance Pricing
+      summary: Delete a specific distance pricing record by ID
+      operationId: deleteDistancePricing
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '204':
+          description: No Content
+
+  /vehicletypes:
+    post:
+      tags:
+        - Vehicle Type
+      summary: Add a new vehicle type record
+      operationId: createVehicleType
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleType'
+      responses:
+        '201':
+          description: Vehicle type created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleType'
+        '400':
+          description: Bad Request
+
+    get:
+      tags:
+        - Vehicle Type
+      summary: Retrieve all vehicle type records
+      operationId: getAllVehicleTypes
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of vehicle type records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehicleType'
+
+  /vehicletypes/{id}:
+    get:
+      tags:
+        - Vehicle Type
+      summary: Retrieve a specific vehicle type record by ID
+      operationId: getVehicleTypeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: Vehicle type details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleType'
+
+    put:
+      tags:
+        - Vehicle Type
+      summary: Update an existing vehicle type record by ID
+      operationId: updateVehicleType
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleType'
+      responses:
+        '200':
+          description: Vehicle type updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleType'
+        '400':
+          description: Bad Request
+
+    delete:
+      tags:
+        - Vehicle Type
+      summary: Delete a specific vehicle type record by ID
+      operationId: deleteVehicleType
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '204':
+          description: No Content
+
+  /pricing/surgepricing:
+    post:
+      tags:
+        - Surge Pricing
+      summary: Create a new surge pricing rule
+      operationId: createSurgePricing
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurgePrice'
+      responses:
+        '201':
+          description: Surge pricing rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SurgePrice'
+        '400':
+          description: Bad Request
+
+    get:
+      tags:
+        - Surge Pricing
+      summary: Retrieve all surge pricing records
+      operationId: getAllSurgePricing
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of surge pricing records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SurgePrice'
+
+  /surgepricing/{id}:
+    get:
+      tags:
+        - Surge Pricing
+      summary: Retrieve a specific surge pricing record by ID
+      operationId: getSurgePricingById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: Surge pricing record details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SurgePrice'
+
+    put:
+      tags:
+        - Surge Pricing
+      summary: Update an existing surge pricing record by ID
+      operationId: updateSurgePricing
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurgePrice'
+      responses:
+        '200':
+          description: Surge pricing record updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SurgePrice'
+        '400':
+          description: Bad Request
+
+    delete:
+      tags:
+        - Surge Pricing
+      summary: Delete a specific surge pricing record by ID
+      operationId: deleteSurgePricing
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '204':
+          description: No Content
+
+  /pricing/parceltype:
+    post:
+      tags:
+        - Parcel Type
+      summary: Create a new parcel type
+      operationId: createParcelType
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelType'
+      responses:
+        '201':
+          description: Parcel type created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelType'
+        '400':
+          description: Bad Request
+
+    get:
+      tags:
+        - Parcel Type
+      summary: Retrieve all parcel types
+      operationId: getAllParcelTypes
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of parcel types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParcelType'
+  /pricing/parceltypes/{id}: 
+    get:
+      tags:
+        - Parcel Type
+      summary: Retrieve specific  parceltype record by ID
+      operationId: getParceltypeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: parceltype record details
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ParcelType'
+    
+    put:
+      tags:
+        - Parcel Type
+      summary: Update an existing Parcel Type record by ID
+      operationId: updateParcelType
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelType'
+      responses:
+        '200':
+          description: Parcel Type record updated by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelType'
+        '400':
+          description: Bad Request
+          
+    delete:
+      tags:
+        - Parcel Type
+      summary: Delete a specific parcel type record by ID
+      operationId: deleteParcelType
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '204':
+          description: No Content
+  /pricing/parcelweight:
+    post:
+      tags:
+        - Parcel Weight
+      summary: Create a new parcel weight range
+      operationId: createParcelWeight
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelWeight'
+      responses:
+        '201':
+          description: Parcel weight range created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelWeight'
+        '400':
+          description: Bad Request
+          
+    get:
+      tags:
+        - Parcel Weight
+      summary: Retrieve all parcel weight ranges
+      operationId: getAllParcelWeights
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of parcel weight ranges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParcelWeight'
+                  
+  /pricing/parcel_weight/{id}:
+    get:
+      tags:
+        - Parcel Weight
+      summary: Retrieve specific  parcelweight record by ID
+      operationId: getParcelWeightById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: parcel weight record details
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ParcelWeight'
+
+    put:
+      tags:
+        - Parcel Weight
+      summary: Update an existing Parcel Weight record by ID
+      operationId: updateParcelWeightById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelWeight'
+      responses:
+        '200':
+          description: Parcel Type record updated by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelWeight'
+        '400':
+          description: Bad Request
+
+    delete:
+      tags:
+        - Parcel Weight
+      summary: Delete a specific parcel weight record by ID
+      operationId: deleteParcelWeightById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '204':
+          description: No Content
+          
+  /pricing/parcelsizes:
+    post:
+      tags:
+        - Parcel Sizes
+      summary: Create a new parcel Size 
+      operationId: createParcelSize
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelSizes'
+      responses:
+        '201':
+          description: Parcel Size  created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelSizes'
+        '400':
+          description: Bad Request
+    get:
+      tags:
+        - Parcel Sizes
+      summary: Retrieve specific  parcelsize record by ID
+      operationId: getParcelSizeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: parcel sizes record details
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ParcelSizes'
+  
+  /pricing/parcelsizes/{id}:
+    get:
+      tags:
+        - Parcel Sizes
+      summary: Retrieve specific  parcelsize record by ID
+      operationId: getParcelSizesById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: parcel weight record details
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ParcelSizes'
+    put:
+      tags:
+        - Parcel Sizes
+      summary: Update an existing Parcel Size record by ID
+      operationId: updateParcelSizeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelSizes'
+      responses:
+        '200':
+          description: Parcel Size record updated by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelSizes'
+        '400':
+          description: Bad Request
+    delete:
+      tags:
+        - Parcel Sizes
+      summary: Delete a specific parcel size record by ID
+      operationId: deleteParcelSizeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '204':
+          description: No Content
+  
+    
+  /pricing/parcelrates:
+    post:
+      tags:
+        - Parcel Rates
+      summary: Create a new parcel Rates 
+      operationId: createParcelRate
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelRates'
+      responses:
+        '201':
+          description: Parcel Rate  created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelRates'
+        '400':
+          description: Bad Request
+    get:
+      tags:
+        - Parcel Rates
+      summary: Retrieve specific  parcelrate record by ID
+      operationId: getParcelRateById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: parcel Rates record details
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ParcelRates'
+  
+  /pricing/parcelrates/{id}:
+    get:
+      tags:
+        - Parcel Rates
+      summary: Retrieve specific  parcel Rate record by ID
+      operationId: getParcelRatesById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '200':
+          description: parcel Rate record details
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ParcelRates'
+    put:
+      tags:
+        - Parcel Rates
+      summary: Update an existing Parcel Weight record by ID
+      operationId: updateParcelRateById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelRates'
+      responses:
+        '200':
+          description: Parcel Type record updated by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelWeight'
+        '400':
+          description: Bad Request
+    delete:
+      tags:
+        - Parcel Rates
+      summary: Delete a specific parcel rate record by ID
+      operationId: deleteParcelRateById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParameter'
+      responses:
+        '204':
+          description: No Content
+  
+ 
+  /servicetypes:
+  
+    post:
+      tags:
+        - Service Type
+      summary: Create a new Service Type 
+      operationId: createServiceType
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceTypes'
+      responses:
+        '201':
+          description: Service Type  created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceTypes'
+        '400':
+          description: Bad Request
+    get:
+      tags:
+        - Service Type
+      summary: Retrieve list of Service Types
+      operationId: getServiceTypes
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of service types
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ServiceTypes'
+  
+  /servicetypes/{serviceId}:
+  
+    get:
+      tags:
+        - Service Type
+      summary: Retrieve specific Service Type record by ID
+      operationId: getServiceTypeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/service_idParameter'
+      responses:
+        '200':
+          description: Service Type  details
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ServiceTypes'
+        '404':
+          description: Service Type not found
+    put:
+      tags:
+        - Service Type
+      summary: Update an existing Service Type record by ID
+      operationId: updateServiceTypeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/service_idParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceTypes'
+      responses:
+        '200':
+          description: Service Type record updated by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceTypes'
+        '400':
+          description: Bad Request
+        '404':
+          description: Service Type not found
+    delete:
+      tags:
+        - Service Type
+      summary: Delete a specific Service Type record by ID
+      operationId: deleteServiceTypeById
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/service_idParameter'
+      responses:
+        '204':
+          description: Service Type deleted successfully
+        '404':
+          description: Service Type not found
+          
+  /estimatedRidePrice:
+    get:
+      tags:
+        - Application Apis
+      summary: Retrieve list of Estimated Ride Prices
+      operationId: getEstimatedRidePrice
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of Estimated Ride Prices
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ApplicationApis'
+ 
